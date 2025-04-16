@@ -1,6 +1,6 @@
 import streamlit as st
 import sqlite3
-from datetime import datetime, date, time
+from datetime import datetime, date
 import pandas as pd
 import plotly.express as px
 
@@ -90,10 +90,18 @@ def show_dashboard():
     st.divider()
     st.subheader("📊 Visitor Analytics")
 
+    # Number of visitors per day
     visits_per_day = filtered_df.groupby(filtered_df['timestamp'].dt.date).size().reset_index(name='count')
     if not visits_per_day.empty:
         st.plotly_chart(px.bar(visits_per_day, x='timestamp', y='count', title="Visitors Per Day"))
 
+    # Number of visitors per hour
     visits_per_hour = filtered_df.groupby(filtered_df['timestamp'].dt.hour).size().reset_index(name='count')
     if not visits_per_hour.empty:
         st.plotly_chart(px.line(visits_per_hour, x='timestamp', y='count', markers=True, title="Visitors Per Hour"))
+
+    # Number of visitors per reason (for insights into reasons)
+    visits_per_reason = filtered_df.groupby("reason").size().reset_index(name='count')
+    if not visits_per_reason.empty:
+        st.plotly_chart(px.pie(visits_per_reason, names="reason", values="count", title="Visitors by Reason"))
+
