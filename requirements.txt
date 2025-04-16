@@ -1,5 +1,2 @@
 streamlit
 pandas
-sqlite3; sys_platform != 'win32'
-streamlit
-pandas
