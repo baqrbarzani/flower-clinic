@@ -5,6 +5,6 @@ from style import set_custom_style
 
 st.set_page_config(page_title="Clinic Visitor Manager", layout="centered")
 
-set_custom_style()  # Optional: for custom styles
-show_sidebar()      # Doctor login and selection
-show_dashboard()    # Main visitor interface
+set_custom_style()        # Optional custom style
+show_sidebar()            # Show login sidebar
+show_dashboard()          # Show main content if logged in
