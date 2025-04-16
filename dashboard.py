@@ -5,9 +5,12 @@ import pandas as pd
 
 def show_dashboard():
     if not st.session_state.get("logged_in"):
+        st.info("Please log in from the sidebar to continue.")
         return
 
     doctor = st.session_state.doctor
+
+    # Connect to DB and create table if not exists
     conn = sqlite3.connect("clinic_visitors.db", check_same_thread=False)
     c = conn.cursor()
     c.execute('''
@@ -21,11 +24,11 @@ def show_dashboard():
     ''')
     conn.commit()
 
-    st.subheader("📝 Register a new visitor")
+    st.header("📝 Register a New Visitor")
 
     with st.form("visitor_form"):
-        name = st.text_input("Visitor's name")
-        reason = st.text_area("Reason for visit")
+        name = st.text_input("Visitor's Name")
+        reason = st.text_area("Reason for Visit")
         submitted = st.form_submit_button("Add Visitor")
 
         if submitted:
@@ -43,7 +46,7 @@ def show_dashboard():
     st.divider()
     st.subheader(f"📋 Visitor List for {doctor}")
 
-    df = pd.read_sql_query(f'''
+    df = pd.read_sql_query('''
         SELECT name, reason, timestamp FROM visitors
         WHERE doctor = ?
         ORDER BY timestamp DESC
@@ -51,12 +54,13 @@ def show_dashboard():
 
     if not df.empty:
         st.dataframe(df, use_container_width=True)
+
         csv = df.to_csv(index=False).encode('utf-8')
         st.download_button(
             label="⬇️ Download as CSV",
             data=csv,
-            file_name=f"{doctor}_visitors.csv",
+            file_name=f"{doctor.replace(' ', '_')}_visitors.csv",
             mime='text/csv'
         )
     else:
-        st.info("No visitors recorded yet.")
+        st.info("No visitors yet.")
