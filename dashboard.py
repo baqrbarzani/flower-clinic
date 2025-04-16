@@ -100,7 +100,7 @@ def show_dashboard():
     if not visits_per_hour.empty:
         st.plotly_chart(px.line(visits_per_hour, x='timestamp', y='count', markers=True, title="Visitors Per Hour"))
 
-    # Number of visitors per reason
+    # Number of visitors per reason (for insights into reasons)
     visits_per_reason = filtered_df.groupby("reason").size().reset_index(name='count')
     if not visits_per_reason.empty:
         st.plotly_chart(px.pie(visits_per_reason, names="reason", values="count", title="Visitors by Reason"))
