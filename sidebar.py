@@ -47,7 +47,7 @@ def show_sidebar():
                         st.session_state.logged_in = True
                         st.session_state.doctor = new_user
                         st.success(f"Doctor {new_user} registered and logged in successfully.")
-                        st.experimental_rerun()  # Refresh the page to reflect logged-in state
+                        st.rerun()  # Refresh the page to reflect logged-in state
 
                     except sqlite3.IntegrityError:
                         st.warning("Username already exists.")
@@ -69,6 +69,6 @@ def show_sidebar():
                 st.session_state.logged_in = True
                 st.session_state.doctor = username
                 st.success("Login successful.")
-                st.experimental_rerun()
+                st.rerun()  # Refresh the page to reflect logged-in state
             else:
                 st.error("Incorrect username or password.")
