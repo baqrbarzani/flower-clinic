@@ -36,20 +36,26 @@ def show_sidebar():
             if new_user and new_pass and confirm_pass:
                 if new_pass == confirm_pass:
                     try:
+                        # Insert the new doctor into the database
                         conn = sqlite3.connect("clinic_visitors.db", check_same_thread=False)
                         c = conn.cursor()
                         c.execute("INSERT INTO doctors (username, password) VALUES (?, ?)", 
                                   (new_user, hash_password(new_pass)))
                         conn.commit()
-                        st.success("Doctor registered successfully. Please log in.")
-                        tab = "Login"  # Switch back to login after registration
+
+                        # Log the user in automatically after successful registration
+                        st.session_state.logged_in = True
+                        st.session_state.doctor = new_user
+                        st.success(f"Doctor {new_user} registered and logged in successfully.")
+                        st.experimental_rerun()  # Refresh the page to reflect logged-in state
+
                     except sqlite3.IntegrityError:
                         st.warning("Username already exists.")
                 else:
                     st.warning("Passwords do not match.")
             else:
                 st.warning("Please provide both username and password.")
-                
+
     elif tab == "Login":
         username = st.sidebar.text_input("Username")
         password = st.sidebar.text_input("Password", type="password")
