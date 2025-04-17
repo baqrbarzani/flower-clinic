@@ -1,25 +1,36 @@
 import streamlit as st
+import sqlite3
+import hashlib
 
-# Dummy credentials for doctors
-DOCTOR_CREDENTIALS = {
-    "dr_ali": "1234",
-    "dr_lina": "5678"
-}
+def hash_password(password):
+    return hashlib.sha256(password.encode()).hexdigest()
 
-def show_login():
-    st.title("🔐 Doctor Login")
+def verify_password(input_password, stored_password):
+    return hash_password(input_password) == stored_password
 
-    with st.form("login_form"):
-        username = st.text_input("Username")
-        password = st.text_input("Password", type="password")
-        login_btn = st.form_submit_button("Login")
+def login():
+    st.title("Doctor Login")
 
-        if login_btn:
-            if username in DOCTOR_CREDENTIALS and DOCTOR_CREDENTIALS[username] == password:
+    username = st.text_input("Username")
+    password = st.text_input("Password", type="password")
+
+    if st.button("Login"):
+        if username and password:
+            conn = sqlite3.connect("clinic_visitors.db")
+            c = conn.cursor()
+            c.execute("SELECT password FROM doctors WHERE username = ?", (username,))
+            result = c.fetchone()
+            conn.close()
+
+            if result and verify_password(password, result[0]):
                 st.session_state.logged_in = True
-                st.session_state.doctor = username
-                st.success("Logged in successfully.")
-                st.experimental_set_query_params(page="dashboard")
-                st.stop()  # <- instead of rerun, just stop here
+                st.session_state.username = username
+                st.success(f"Welcome, Dr. {username}!")
+                st.experimental_rerun()
             else:
-                st.error("Invalid credentials.")
+                st.error("Invalid username or password.")
+        else:
+            st.warning("Please enter both username and password.")
+
+if __name__ == "__main__":
+    login()
