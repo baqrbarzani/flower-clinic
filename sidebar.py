@@ -24,10 +24,12 @@ def show_sidebar():
     init_db()
     st.sidebar.title("👨‍⚕️ Clinic Portal")
 
-    # Set default form to "Register New Doctor"
-    tab = st.sidebar.radio("Registration", ["Register New Doctor", "Login"], index=0)
+    # Create tab for choosing between Login and Register
+    tab = st.sidebar.radio("Select Action", ["Login", "Register New Doctor"], index=0)
 
+    # Registration Form
     if tab == "Register New Doctor":
+        st.sidebar.subheader("Register a New Doctor")
         new_user = st.sidebar.text_input("New Username")
         new_pass = st.sidebar.text_input("New Password", type="password")
         confirm_pass = st.sidebar.text_input("Confirm Password", type="password")
@@ -56,7 +58,9 @@ def show_sidebar():
             else:
                 st.warning("Please provide both username and password.")
 
+    # Login Form
     elif tab == "Login":
+        st.sidebar.subheader("Login")
         username = st.sidebar.text_input("Username")
         password = st.sidebar.text_input("Password", type="password")
 
