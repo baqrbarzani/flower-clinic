@@ -1,29 +1,25 @@
 import streamlit as st
-import sqlite3
-import hashlib
-
-def hash_password(password):
-    return hashlib.sha256(password.encode()).hexdigest()
+from database import get_db_connection
 
 def show_login():
     st.title("Doctor Login")
 
-    username = st.text_input("Username", key="login_username")
-    password = st.text_input("Password", type="password", key="login_password")
+    username = st.text_input("Username")
+    password = st.text_input("Password", type="password")
 
-    if st.button("Login", key="login_button"):
+    if st.button("Login"):
         if username and password:
-            conn = sqlite3.connect("clinic_visitors.db")
-            c = conn.cursor()
-            c.execute("SELECT password FROM doctors WHERE username = ?", (username,))
-            result = c.fetchone()
+            conn = get_db_connection()
+            cursor = conn.cursor()
+            cursor.execute("SELECT password FROM users WHERE username = ?", (username,))
+            result = cursor.fetchone()
             conn.close()
 
-            if result and hash_password(password) == result[0]:
+            if result and result[0] == password:
                 st.session_state.logged_in = True
                 st.session_state.username = username
                 st.success(f"Welcome, Dr. {username}!")
-                st.rerun()
+                st.experimental_rerun()
             else:
                 st.error("Invalid username or password.")
         else:
