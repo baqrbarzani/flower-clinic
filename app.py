@@ -1,22 +1,18 @@
-import sqlite3
-import os
+import streamlit as st
+from login import show_login
+from register import show_register
+from dashboard import show_dashboard
 
-# Define the path to the database file
-BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-db_path = os.path.join(BASE_DIR, "clinic_visitors.db")
+def main():
+    st.sidebar.title("Navigation")
+    page = st.sidebar.radio("Go to", ["Login", "Register", "Dashboard"])
 
-def initialize_database():
-    conn = sqlite3.connect(db_path)
-    cursor = conn.cursor()
-    # Create the 'diseases' table if it doesn't exist
-    cursor.execute('''
-        CREATE TABLE IF NOT EXISTS diseases (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            disease_name TEXT NOT NULL
-        );
-    ''')
-    conn.commit()
-    conn.close()
+    if page == "Login":
+        show_login()
+    elif page == "Register":
+        show_register()
+    elif page == "Dashboard":
+        show_dashboard()
 
-# Call the function to initialize the database
-initialize_database()
+if __name__ == "__main__":
+    main()
