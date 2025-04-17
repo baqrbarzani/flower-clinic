@@ -24,30 +24,10 @@ def show_sidebar():
     init_db()
     st.sidebar.title("👨‍⚕️ Clinic Portal")
 
-    tab = st.sidebar.radio("Login", ["Login", "Register New Doctor"], index=0)
+    # Set default form to "Register New Doctor"
+    tab = st.sidebar.radio("Registration", ["Register New Doctor", "Login"], index=0)
 
-    if tab == "Login":
-        username = st.sidebar.text_input("Username")
-        password = st.sidebar.text_input("Password", type="password")
-
-        if st.sidebar.button("🔐 Login"):
-            conn = sqlite3.connect("clinic_visitors.db", check_same_thread=False)
-            c = conn.cursor()
-            c.execute("SELECT * FROM doctors WHERE username = ? AND password = ?", (username, hash_password(password)))
-            doctor = c.fetchone()
-            if doctor:
-                st.session_state.logged_in = True
-                st.session_state.doctor = username
-                st.success("Login successful.")
-                st.experimental_rerun()
-            else:
-                st.error("Incorrect username or password.")
-        
-        if st.sidebar.button("Don't have an account? Register"):
-            tab = "Register New Doctor"
-            st.experimental_rerun()
-
-    elif tab == "Register New Doctor":
+    if tab == "Register New Doctor":
         new_user = st.sidebar.text_input("New Username")
         new_pass = st.sidebar.text_input("New Password", type="password")
         confirm_pass = st.sidebar.text_input("Confirm Password", type="password")
@@ -69,4 +49,20 @@ def show_sidebar():
                     st.warning("Passwords do not match.")
             else:
                 st.warning("Please provide both username and password.")
+                
+    elif tab == "Login":
+        username = st.sidebar.text_input("Username")
+        password = st.sidebar.text_input("Password", type="password")
 
+        if st.sidebar.button("🔐 Login"):
+            conn = sqlite3.connect("clinic_visitors.db", check_same_thread=False)
+            c = conn.cursor()
+            c.execute("SELECT * FROM doctors WHERE username = ? AND password = ?", (username, hash_password(password)))
+            doctor = c.fetchone()
+            if doctor:
+                st.session_state.logged_in = True
+                st.session_state.doctor = username
+                st.success("Login successful.")
+                st.experimental_rerun()
+            else:
+                st.error("Incorrect username or password.")
