@@ -1,5 +1,31 @@
-doctor,name,reason,timestamp
-Dr. Smith,John Doe,Follow-up on blood test,2025-04-15 10:30:00
-Dr. Johnson,Emily Clark,New patient consultation,2025-04-15 11:00:00
-Dr. Patel,Michael Brown,Annual check-up,2025-04-15 11:45:00
-Dr. Lee,Sarah Miller,Discussion about results,2025-04-15 12:15:00
+import sqlite3
+import os
+
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+DB_PATH = os.path.join(BASE_DIR, "clinic_visitors.db")
+
+def get_db_connection():
+    conn = sqlite3.connect(DB_PATH)
+    conn.row_factory = sqlite3.Row
+    return conn
+
+def initialize_database():
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    cursor.execute('''
+        CREATE TABLE IF NOT EXISTS users (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            username TEXT NOT NULL UNIQUE,
+            password TEXT NOT NULL
+        );
+    ''')
+    cursor.execute('''
+        CREATE TABLE IF NOT EXISTS diseases (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            disease_name TEXT NOT NULL
+        );
+    ''')
+    conn.commit()
+    conn.close()
+
+initialize_database()
