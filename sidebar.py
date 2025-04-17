@@ -24,7 +24,7 @@ def show_sidebar():
     init_db()
     st.sidebar.title("👨‍⚕️ Clinic Portal")
 
-    tab = st.sidebar.radio("Menu", ["Login", "Register New Doctor"])
+    tab = st.sidebar.radio("Login", ["Login", "Register New Doctor"], index=0)
 
     if tab == "Login":
         username = st.sidebar.text_input("Username")
@@ -42,12 +42,16 @@ def show_sidebar():
                 st.experimental_rerun()
             else:
                 st.error("Incorrect username or password.")
+        
+        if st.sidebar.button("Don't have an account? Register"):
+            tab = "Register New Doctor"
+            st.experimental_rerun()
 
     elif tab == "Register New Doctor":
         new_user = st.sidebar.text_input("New Username")
         new_pass = st.sidebar.text_input("New Password", type="password")
         confirm_pass = st.sidebar.text_input("Confirm Password", type="password")
-        
+
         if st.sidebar.button("📝 Register"):
             if new_user and new_pass and confirm_pass:
                 if new_pass == confirm_pass:
@@ -58,9 +62,11 @@ def show_sidebar():
                                   (new_user, hash_password(new_pass)))
                         conn.commit()
                         st.success("Doctor registered successfully. Please log in.")
+                        tab = "Login"  # Switch back to login after registration
                     except sqlite3.IntegrityError:
                         st.warning("Username already exists.")
                 else:
                     st.warning("Passwords do not match.")
             else:
                 st.warning("Please provide both username and password.")
+
