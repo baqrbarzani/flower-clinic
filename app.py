@@ -1,22 +1,15 @@
-import streamlit as st
-from dashboard import show_dashboard
-from login import show_login
-from sidebar import show_sidebar
-from style import set_custom_style
+def initialize_database():
+    conn = sqlite3.connect(db_path)
+    cursor = conn.cursor()
+    cursor.execute('''
+        CREATE TABLE IF NOT EXISTS diseases (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            disease_name TEXT NOT NULL
+        );
+    ''')
+    conn.commit()
+    conn.close()
 
-# Set Streamlit page configuration
-st.set_page_config(page_title="Clinic Visitor Manager", layout="centered")
-
-# Set custom styling
-set_custom_style()
-
-# Display sidebar
-show_sidebar()
-
-# Display content based on the page selection
-page = st.sidebar.radio("Navigation", ["Login", "Dashboard"])
-
-if page == "Login":
-    show_login()
-elif page == "Dashboard":
-    show_dashboard()
+if __name__ == "__main__":
+    initialize_database()
+    # Proceed with the rest of your application
