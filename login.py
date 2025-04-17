@@ -1,3 +1,4 @@
+# login.py
 import streamlit as st
 import sqlite3
 import hashlib
@@ -5,10 +6,7 @@ import hashlib
 def hash_password(password):
     return hashlib.sha256(password.encode()).hexdigest()
 
-def verify_password(input_password, stored_password):
-    return hash_password(input_password) == stored_password
-
-def login():
+def show_login():
     st.title("Doctor Login")
 
     username = st.text_input("Username")
@@ -22,7 +20,7 @@ def login():
             result = c.fetchone()
             conn.close()
 
-            if result and verify_password(password, result[0]):
+            if result and hash_password(password) == result[0]:
                 st.session_state.logged_in = True
                 st.session_state.username = username
                 st.success(f"Welcome, Dr. {username}!")
@@ -31,6 +29,3 @@ def login():
                 st.error("Invalid username or password.")
         else:
             st.warning("Please enter both username and password.")
-
-if __name__ == "__main__":
-    login()
