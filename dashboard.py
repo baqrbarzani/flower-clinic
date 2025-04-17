@@ -29,7 +29,10 @@ def show_dashboard():
 
     with st.form("visitor_form"):
         name = st.text_input("Visitor's Name")
-        reason = st.text_area("Reason for Visit")
+        reason = st.selectbox(
+            "Reason for Visit",
+            ["heart disease", "back pain", "frozen shoulder"]
+        )
         submitted = st.form_submit_button("Add Visitor")
 
         if submitted:
@@ -90,17 +93,21 @@ def show_dashboard():
     st.divider()
     st.subheader("📊 Visitor Analytics")
 
-    # Number of visitors per day
+    # Visitors per day
     visits_per_day = filtered_df.groupby(filtered_df['timestamp'].dt.date).size().reset_index(name='count')
     if not visits_per_day.empty:
-        st.plotly_chart(px.bar(visits_per_day, x='timestamp', y='count', title="Visitors Per Day"))
+        fig1 = px.bar(visits_per_day, x='timestamp', y='count', title="Visitors Per Day", labels={'timestamp': 'Date', 'count': 'Number of Visitors'})
+        st.plotly_chart(fig1, use_container_width=True)
 
-    # Number of visitors per hour
+    # Visitors per hour
     visits_per_hour = filtered_df.groupby(filtered_df['timestamp'].dt.hour).size().reset_index(name='count')
     if not visits_per_hour.empty:
-        st.plotly_chart(px.line(visits_per_hour, x='timestamp', y='count', markers=True, title="Visitors Per Hour"))
+        fig2 = px.line(visits_per_hour, x='timestamp', y='count', markers=True, title="Visitors Per Hour", labels={'timestamp': 'Hour', 'count': 'Number of Visitors'})
+        st.plotly_chart(fig2, use_container_width=True)
 
-    # Number of visitors per reason (for insights into reasons)
-    visits_per_reason = filtered_df.groupby("reason").size().reset_index(name='count')
-    if not visits_per_reason.empty:
-        st.plotly_chart(px.pie(visits_per_reason, names="reason", values="count", title="Visitors by Reason"))
+    # Visitors by reason
+    visits_by_reason = filtered_df['reason'].value_counts().reset_index()
+    visits_by_reason.columns = ['reason', 'count']
+    if not visits_by_reason.empty:
+        fig3 = px.pie(visits_by_reason, names='reason', values='count', title="Visitors by Reason")
+        st.plotly_chart(fig3, use_container_width=True)
