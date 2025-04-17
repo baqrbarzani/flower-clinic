@@ -23,7 +23,7 @@ def show_login():
                 st.session_state.logged_in = True
                 st.session_state.username = username
                 st.success(f"Welcome, Dr. {username}!")
-                st.experimental_rerun()
+                st.rerun()
             else:
                 st.error("Invalid username or password.")
         else:
