@@ -1,33 +1,25 @@
 import streamlit as st
 
+# Dummy credentials for doctors
+DOCTOR_CREDENTIALS = {
+    "dr_ali": "1234",
+    "dr_lina": "5678"
+}
+
 def show_login():
-    # Doctor credentials (for demo purposes only)
-    doctor_credentials = {
-        "Dr. Smith": "smith123",
-        "Dr. Johnson": "johnson123",
-        "Dr. Patel": "patel123",
-        "Dr. Lee": "lee123"
-    }
+    st.title("🔐 Doctor Login")
 
-    st.title("Doctor Login")
-
-    if not st.session_state.get("logged_in"):
-        with st.form("login_form"):
-            doctor_name = st.selectbox("Select Your Name", list(doctor_credentials.keys()))
-            password = st.text_input("Enter Password", type="password")
-            login_btn = st.form_submit_button("Login")
+    with st.form("login_form"):
+        username = st.text_input("Username")
+        password = st.text_input("Password", type="password")
+        login_btn = st.form_submit_button("Login")
 
         if login_btn:
-            if password == doctor_credentials.get(doctor_name):
+            if username in DOCTOR_CREDENTIALS and DOCTOR_CREDENTIALS[username] == password:
                 st.session_state.logged_in = True
-                st.session_state.doctor = doctor_name
-                st.success(f"Welcome, {doctor_name}!")
-                st.experimental_rerun()
+                st.session_state.doctor = username
+                st.success("Logged in successfully.")
+                st.experimental_set_query_params(page="dashboard")
+                st.stop()  # <- instead of rerun, just stop here
             else:
-                st.error("Incorrect password.")
-    else:
-        st.success(f"Already logged in as {st.session_state.doctor}")
-        if st.button("🔓 Logout"):
-            st.session_state.logged_in = False
-            st.session_state.doctor = None
-            st.experimental_rerun()
+                st.error("Invalid credentials.")
