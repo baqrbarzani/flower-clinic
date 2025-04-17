@@ -22,7 +22,7 @@ def hash_password(password):
 
 def show_sidebar():
     init_db()
-    st.sidebar.title("👨‍⚕️ Doctor Portal")
+    st.sidebar.title("👨‍⚕️ Clinic Portal")
 
     tab = st.sidebar.radio("Menu", ["Login", "Register New Doctor"])
 
@@ -46,16 +46,21 @@ def show_sidebar():
     elif tab == "Register New Doctor":
         new_user = st.sidebar.text_input("New Username")
         new_pass = st.sidebar.text_input("New Password", type="password")
+        confirm_pass = st.sidebar.text_input("Confirm Password", type="password")
+        
         if st.sidebar.button("📝 Register"):
-            if new_user and new_pass:
-                try:
-                    conn = sqlite3.connect("clinic_visitors.db", check_same_thread=False)
-                    c = conn.cursor()
-                    c.execute("INSERT INTO doctors (username, password) VALUES (?, ?)", 
-                              (new_user, hash_password(new_pass)))
-                    conn.commit()
-                    st.success("Doctor registered successfully. Please log in.")
-                except sqlite3.IntegrityError:
-                    st.warning("Username already exists.")
+            if new_user and new_pass and confirm_pass:
+                if new_pass == confirm_pass:
+                    try:
+                        conn = sqlite3.connect("clinic_visitors.db", check_same_thread=False)
+                        c = conn.cursor()
+                        c.execute("INSERT INTO doctors (username, password) VALUES (?, ?)", 
+                                  (new_user, hash_password(new_pass)))
+                        conn.commit()
+                        st.success("Doctor registered successfully. Please log in.")
+                    except sqlite3.IntegrityError:
+                        st.warning("Username already exists.")
+                else:
+                    st.warning("Passwords do not match.")
             else:
                 st.warning("Please provide both username and password.")
