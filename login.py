@@ -1,4 +1,3 @@
-# login.py
 import streamlit as st
 import sqlite3
 import hashlib
@@ -9,10 +8,10 @@ def hash_password(password):
 def show_login():
     st.title("Doctor Login")
 
-    username = st.text_input("Username")
-    password = st.text_input("Password", type="password")
+    username = st.text_input("Username", key="login_username")
+    password = st.text_input("Password", type="password", key="login_password")
 
-    if st.button("Login"):
+    if st.button("Login", key="login_button"):
         if username and password:
             conn = sqlite3.connect("clinic_visitors.db")
             c = conn.cursor()
