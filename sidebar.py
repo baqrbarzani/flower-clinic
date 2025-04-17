@@ -2,7 +2,7 @@ import streamlit as st
 import sqlite3
 import hashlib
 
-# Initialize doctor table
+# Initialize the doctors table
 def init_db():
     conn = sqlite3.connect("clinic_visitors.db", check_same_thread=False)
     c = conn.cursor()
@@ -16,18 +16,27 @@ def init_db():
     conn.commit()
     conn.close()
 
-# Password hashing
+# Hash the password
 def hash_password(password):
     return hashlib.sha256(password.encode()).hexdigest()
+
+# Verify the password
+def verify_password(input_password, stored_password):
+    return hash_password(input_password) == stored_password
 
 def show_sidebar():
     init_db()
     st.sidebar.title("👨‍⚕️ Clinic Portal")
 
-    # Create tab for choosing between Login and Register
-    tab = st.sidebar.radio("Select Action", ["Login", "Register New Doctor"], index=0)
+    # Initialize session state variables
+    if 'logged_in' not in st.session_state:
+        st.session_state.logged_in = False
+    if 'doctor' not in st.session_state:
+        st.session_state.doctor = ""
 
-    # Registration Form
+    # Choose between Login and Register
+    tab = st.sidebar.radio("Select Action", ["Login", "Register New Doctor"])
+
     if tab == "Register New Doctor":
         st.sidebar.subheader("Register a New Doctor")
         new_user = st.sidebar.text_input("New Username")
@@ -38,12 +47,12 @@ def show_sidebar():
             if new_user and new_pass and confirm_pass:
                 if new_pass == confirm_pass:
                     try:
-                        # Insert the new doctor into the database
                         conn = sqlite3.connect("clinic_visitors.db", check_same_thread=False)
                         c = conn.cursor()
                         c.execute("INSERT INTO doctors (username, password) VALUES (?, ?)", 
                                   (new_user, hash_password(new_pass)))
                         conn.commit()
+                        conn.close()
 
                         # Log the user in automatically after successful registration
                         st.session_state.logged_in = True
@@ -58,7 +67,6 @@ def show_sidebar():
             else:
                 st.warning("Please provide both username and password.")
 
-    # Login Form
     elif tab == "Login":
         st.sidebar.subheader("Login")
         username = st.sidebar.text_input("Username")
@@ -67,9 +75,11 @@ def show_sidebar():
         if st.sidebar.button("🔐 Login"):
             conn = sqlite3.connect("clinic_visitors.db", check_same_thread=False)
             c = conn.cursor()
-            c.execute("SELECT * FROM doctors WHERE username = ? AND password = ?", (username, hash_password(password)))
-            doctor = c.fetchone()
-            if doctor:
+            c.execute("SELECT password FROM doctors WHERE username = ?", (username,))
+            result = c.fetchone()
+            conn.close()
+
+            if result and verify_password(password, result[0]):
                 st.session_state.logged_in = True
                 st.session_state.doctor = username
                 st.success("Login successful.")
