@@ -3,9 +3,9 @@ credentials:
     doctor1:
       email: doctor1@example.com
       name: Doctor One
-      password: 'abc123'  # Use hashed passwords for production
+      password: 'abc123'  # Use hashed passwords in production
 
 cookie:
   name: flowerclinic_cookie
-  key: some_secret_key
+  key: some_random_key
   expiry_days: 1
