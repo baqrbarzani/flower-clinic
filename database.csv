@@ -1,14 +1,18 @@
 import sqlite3
-import get_db_connection
+import os
+import bcrypt
 
+# Define the path to the SQLite database
 DB_PATH = os.path.join(os.path.dirname(__file__), "clinic_visitors.db")
 
 def get_db_connection():
+    """Establishes a connection to the SQLite database."""
     conn = sqlite3.connect(DB_PATH, check_same_thread=False)
-    conn.row_factory = sqlite3.Row
+    conn.row_factory = sqlite3.Row  # Enables name-based access to columns
     return conn
 
 def initialize_database():
+    """Initializes the database by creating necessary tables if they don't exist."""
     conn = get_db_connection()
     cursor = conn.cursor()
 
@@ -42,3 +46,29 @@ def initialize_database():
 
     conn.commit()
     conn.close()
+
+def add_user(username, password):
+    """Adds a new user with a hashed password to the database."""
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    hashed_password = bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt())
+    try:
+        cursor.execute("INSERT INTO users (username, password) VALUES (?, ?)", (username, hashed_password))
+        conn.commit()
+    except sqlite3.IntegrityError:
+        conn.close()
+        return False  # Username already exists
+    conn.close()
+    return True
+
+def verify_user(username, password):
+    """Verifies a user's credentials."""
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    cursor.execute("SELECT password FROM users WHERE username = ?", (username,))
+    result = cursor.fetchone()
+    conn.close()
+    if result:
+        stored_password = result['password']
+        return bcrypt.checkpw(password.encode('utf-8'), stored_password)
+    return False
