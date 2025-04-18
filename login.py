@@ -1,5 +1,5 @@
 import streamlit as st
-from database importshow_login
+from database import get_db_connection
 
 def show_login():
     st.title("Login")
