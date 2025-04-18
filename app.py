@@ -1,13 +1,17 @@
 import streamlit as st
 from dashboard import show_dashboard
-from PIL import Image
+from login import show_login
+from database import initialize_database
 
-# Show image in sidebar (must be a valid path or URL)
-st.sidebar.image("assets/health.jpg", use_column_width=True, caption="Flower Health Clinic")
+# Initialize database
+initialize_database()
 
-# Navigation
-st.sidebar.title("Navigation")
-page = st.sidebar.selectbox("Choose a page", ["Dashboard"])
+# Sidebar navigation
+st.sidebar.title("Flower Health Clinic")
+page = st.sidebar.selectbox("Go to", ["Login", "Dashboard"])
 
-if page == "Dashboard":
+# Page routing
+if page == "Login":
+    show_login()
+elif page == "Dashboard":
     show_dashboard()
