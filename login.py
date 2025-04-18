@@ -1,30 +1,33 @@
 import streamlit as st
-from database import verify_user, add_user
 
 def show_login():
-    st.title("Clinic Visitor Login")
-    menu = ["Login", "Register"]
-    choice = st.selectbox("Menu", menu)
+    # Doctor credentials (for demo purposes only)
+    doctor_credentials = {
+        "Dr. Smith": "smith123",
+        "Dr. Johnson": "johnson123",
+        "Dr. Patel": "patel123",
+        "Dr. Lee": "lee123"
+    }
 
-    if choice == "Login":
-        username = st.text_input("Username")
-        password = st.text_input("Password", type="password")
-        login_button = st.button("Login")
+    st.title("Doctor Login")
 
-        if login_button:
-            if verify_user(username, password):
-                st.session_state['authenticated'] = True
-                st.success("Login successful!")
+    if not st.session_state.get("logged_in"):
+        with st.form("login_form"):
+            doctor_name = st.selectbox("Select Your Name", list(doctor_credentials.keys()))
+            password = st.text_input("Enter Password", type="password")
+            login_btn = st.form_submit_button("Login")
+
+        if login_btn:
+            if password == doctor_credentials.get(doctor_name):
+                st.session_state.logged_in = True
+                st.session_state.doctor = doctor_name
+                st.success(f"Welcome, {doctor_name}!")
+                st.experimental_rerun()
             else:
-                st.error("Invalid username or password.")
-
-    elif choice == "Register":
-        new_username = st.text_input("New Username")
-        new_password = st.text_input("New Password", type="password")
-        register_button = st.button("Register")
-
-        if register_button:
-            if add_user(new_username, new_password):
-                st.success("Registration successful! You can now log in.")
-            else:
-                st.error("Username already exists. Please choose a different one.")
+                st.error("Incorrect password.")
+    else:
+        st.success(f"Already logged in as {st.session_state.doctor}")
+        if st.button("🔓 Logout"):
+            st.session_state.logged_in = False
+            st.session_state.doctor = None
+            st.experimental_rerun()
