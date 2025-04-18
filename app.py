@@ -1,9 +1,15 @@
-import os
+import streamlit as st
+from database import verify_user
 
-# Get the absolute path of the current script
-script_dir = os.path.dirname(os.path.abspath(__file__))
+def show_login():
+    st.title("Clinic Visitor Login")
+    username = st.text_input("Username")
+    password = st.text_input("Password", type="password")
+    login_button = st.button("Login")
 
-# Construct the absolute path to the CSV file
-csv_file_path = os.path.join(script_dir, 'your_data.csv')
-
-# Now you can use csv_file_path to access the CSV file
+    if login_button:
+        if verify_user(username, password):
+            st.session_state['authenticated'] = True
+            st.success("Login successful!")
+        else:
+            st.error("Invalid username or password.")
