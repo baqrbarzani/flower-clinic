@@ -12,6 +12,7 @@ def get_db_connection():
 def initialize_database():
     conn = get_db_connection()
     cursor = conn.cursor()
+    # Create users table
     cursor.execute('''
         CREATE TABLE IF NOT EXISTS users (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -19,6 +20,7 @@ def initialize_database():
             password TEXT NOT NULL
         );
     ''')
+    # Create diseases table
     cursor.execute('''
         CREATE TABLE IF NOT EXISTS diseases (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -28,4 +30,5 @@ def initialize_database():
     conn.commit()
     conn.close()
 
+# Initialize the database when the module is imported
 initialize_database()
