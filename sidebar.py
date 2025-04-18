@@ -2,7 +2,7 @@ import streamlit as st
 import sqlite3
 import hashlib
 
-# Create table for doctors
+# Initialize doctor table
 def init_db():
     conn = sqlite3.connect("clinic_visitors.db", check_same_thread=False)
     c = conn.cursor()
@@ -16,20 +16,20 @@ def init_db():
     conn.commit()
     conn.close()
 
-# Hash passwords for safety
+# Password hashing
 def hash_password(password):
     return hashlib.sha256(password.encode()).hexdigest()
 
 def show_sidebar():
     init_db()
-    st.sidebar.title("👩‍⚕️ Clinic Login")
+    st.sidebar.title("👨‍⚕️ Doctor Portal")
 
-    # Tabs for login/register
-    tab = st.sidebar.radio("Select", ["Login", "Register New Doctor"])
+    tab = st.sidebar.radio("Menu", ["Login", "Register New Doctor"])
 
     if tab == "Login":
         username = st.sidebar.text_input("Username")
         password = st.sidebar.text_input("Password", type="password")
+
         if st.sidebar.button("🔐 Login"):
             conn = sqlite3.connect("clinic_visitors.db", check_same_thread=False)
             c = conn.cursor()
@@ -38,24 +38,24 @@ def show_sidebar():
             if doctor:
                 st.session_state.logged_in = True
                 st.session_state.doctor = username
-                st.success("Logged in successfully.")
+                st.success("Login successful.")
                 st.experimental_rerun()
             else:
-                st.error("Invalid credentials.")
+                st.error("Incorrect username or password.")
 
     elif tab == "Register New Doctor":
-        new_username = st.sidebar.text_input("New Username")
-        new_password = st.sidebar.text_input("New Password", type="password")
+        new_user = st.sidebar.text_input("New Username")
+        new_pass = st.sidebar.text_input("New Password", type="password")
         if st.sidebar.button("📝 Register"):
-            if new_username and new_password:
-                conn = sqlite3.connect("clinic_visitors.db", check_same_thread=False)
-                c = conn.cursor()
+            if new_user and new_pass:
                 try:
+                    conn = sqlite3.connect("clinic_visitors.db", check_same_thread=False)
+                    c = conn.cursor()
                     c.execute("INSERT INTO doctors (username, password) VALUES (?, ?)", 
-                              (new_username, hash_password(new_password)))
+                              (new_user, hash_password(new_pass)))
                     conn.commit()
-                    st.success("Doctor registered successfully. You can now log in.")
+                    st.success("Doctor registered successfully. Please log in.")
                 except sqlite3.IntegrityError:
                     st.warning("Username already exists.")
             else:
-                st.warning("Please enter both username and password.")
+                st.warning("Please provide both username and password.")
