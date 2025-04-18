@@ -7,7 +7,7 @@ from yaml.loader import SafeLoader
 with open('config.yaml') as file:
     config = yaml.load(file, Loader=SafeLoader)
 
-# Initialize authenticator without 'preauthorized'
+# Initialize authenticator
 authenticator = stauth.Authenticate(
     config['credentials'],
     config['cookie']['name'],
@@ -16,22 +16,23 @@ authenticator = stauth.Authenticate(
 )
 
 # Render login form in the sidebar
-authenticator.login('Login', location='sidebar')
+name, authentication_status, username = authenticator.login(
+    location='sidebar',
+    fields={
+        'Form name': 'Login',
+        'Username': 'Username',
+        'Password': 'Password',
+        'Login': 'Login'
+    }
+)
 
 # Check authentication status
-if st.session_state["authentication_status"]:
-    st.sidebar.success(f"Welcome *{st.session_state['name']}*")
+if authentication_status:
+    st.sidebar.success(f"Welcome *{name}*")
     authenticator.logout('Logout', location='sidebar')
     st.title('Main Application')
     st.write('This is the main content of the app.')
-elif st.session_state["authentication_status"] is False:
+elif authentication_status is False:
     st.sidebar.error('Username/password is incorrect')
-elif st.session_state["authentication_status"] is None:
+elif authentication_status is None:
     st.sidebar.warning('Please enter your username and password')
-
-# Registration form
-try:
-    if authenticator.register_user('Register', preauthorization=config.get('preauthorized', {}).get('emails', [])):
-        st.success('User registered successfully')
-except Exception as e:
-    st.error(e)
