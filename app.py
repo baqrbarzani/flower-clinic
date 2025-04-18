@@ -7,13 +7,12 @@ from yaml.loader import SafeLoader
 with open('config.yaml') as file:
     config = yaml.load(file, Loader=SafeLoader)
 
-# Initialize authenticator
+# Initialize authenticator without 'preauthorized'
 authenticator = stauth.Authenticate(
     config['credentials'],
     config['cookie']['name'],
     config['cookie']['key'],
-    config['cookie']['expiry_days'],
-    config['preauthorized']
+    config['cookie']['expiry_days']
 )
 
 # Render login form in the sidebar
@@ -29,3 +28,10 @@ elif st.session_state["authentication_status"] is False:
     st.sidebar.error('Username/password is incorrect')
 elif st.session_state["authentication_status"] is None:
     st.sidebar.warning('Please enter your username and password')
+
+# Registration form
+try:
+    if authenticator.register_user('Register', preauthorization=config.get('preauthorized', {}).get('emails', [])):
+        st.success('User registered successfully')
+except Exception as e:
+    st.error(e)
