@@ -3,7 +3,7 @@ import streamlit_authenticator as stauth
 import yaml
 from yaml.loader import SafeLoader
 
-# Load configuration from YAML
+# Load the YAML config
 with open('config.yaml') as file:
     config = yaml.load(file, Loader=SafeLoader)
 
@@ -15,24 +15,23 @@ authenticator = stauth.Authenticate(
     cookie_expiry_days=config['cookie']['expiry_days']
 )
 
-# Login form
-name, authentication_status, username = authenticator.login(
+# 🔐 Login (updated return type is a dict)
+auth_result = authenticator.login(
+    location='sidebar',
     fields={
         'Form name': 'Login',
         'Username': 'Username',
         'Password': 'Password',
         'Login': 'Login'
-    },
-    location='sidebar'
+    }
 )
 
-# Conditional app flow
-if authentication_status:
-    st.sidebar.success(f"Welcome, {name}!")
+if auth_result["authenticated"]:
+    st.sidebar.success(f"Welcome {auth_result['name']} 👋")
     authenticator.logout('Logout', location='sidebar')
     st.title("Dashboard")
-    st.write("This is the main dashboard after logging in.")
-elif authentication_status is False:
+    st.write("Here’s your Flower Clinic dashboard.")
+elif auth_result["authenticated"] is False:
     st.sidebar.error("Invalid username or password.")
-elif authentication_status is None:
-    st.sidebar.info("Please enter your login credentials.")
+else:
+    st.sidebar.info("Please enter your login details.")
