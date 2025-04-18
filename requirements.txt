@@ -1,4 +1,3 @@
-
-
 streamlit
-bcrypt
+matplotlib
+pandas
