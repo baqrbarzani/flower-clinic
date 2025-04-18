@@ -1,10 +1,12 @@
 import streamlit as st
-from login import show_login
-from database import initialize_database
+from database import initialize_database, import_csv_to_db
+import os
 
-def main():
-    initialize_database()
-    show_login()
+# Initialize the database
+initialize_database()
 
-if __name__ == "__main__":
-    main()
+# Import CSV data into the database
+csv_file_path = os.path.join(os.path.dirname(__file__), 'your_data.csv')
+import_csv_to_db(csv_file_path)
+
+# Your Streamlit app code continues here...
