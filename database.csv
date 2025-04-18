@@ -1,17 +1,14 @@
 import sqlite3
 import os
 
-# Define the path to the SQLite database
 DB_PATH = os.path.join(os.path.dirname(__file__), "clinic_visitors.db")
 
 def get_db_connection():
-    """Establishes a connection to the SQLite database."""
     conn = sqlite3.connect(DB_PATH, check_same_thread=False)
-    conn.row_factory = sqlite3.Row  # Enables name-based access to columns
+    conn.row_factory = sqlite3.Row
     return conn
 
 def initialize_database():
-    """Initializes the database by creating necessary tables if they don't exist."""
     conn = get_db_connection()
     cursor = conn.cursor()
 
@@ -43,38 +40,5 @@ def initialize_database():
         )
     """)
 
-    conn.commit()
-    conn.close()
-
-def get_diseases():
-    """Retrieves all diseases from the database."""
-    conn = get_db_connection()
-    cursor = conn.cursor()
-    cursor.execute("SELECT * FROM diseases")
-    diseases = cursor.fetchall()
-    conn.close()
-    return diseases
-
-def add_disease(disease_name):
-    """Adds a new disease to the database."""
-    conn = get_db_connection()
-    cursor = conn.cursor()
-    cursor.execute("INSERT INTO diseases (disease_name) VALUES (?)", (disease_name,))
-    conn.commit()
-    conn.close()
-
-def update_disease(disease_id, new_name):
-    """Updates the name of an existing disease."""
-    conn = get_db_connection()
-    cursor = conn.cursor()
-    cursor.execute("UPDATE diseases SET disease_name = ? WHERE id = ?", (new_name, disease_id))
-    conn.commit()
-    conn.close()
-
-def delete_disease(disease_id):
-    """Deletes a disease from the database."""
-    conn = get_db_connection()
-    cursor = conn.cursor()
-    cursor.execute("DELETE FROM diseases WHERE id = ?", (disease_id,))
     conn.commit()
     conn.close()
