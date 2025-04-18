@@ -1,12 +1,9 @@
-import streamlit as st
-from database import initialize_database, import_csv_to_db
 import os
 
-# Initialize the database
-initialize_database()
+# Get the absolute path of the current script
+script_dir = os.path.dirname(os.path.abspath(__file__))
 
-# Import CSV data into the database
-csv_file_path = os.path.join(os.path.dirname(__file__), 'your_data.csv')
-import_csv_to_db(csv_file_path)
+# Construct the absolute path to the CSV file
+csv_file_path = os.path.join(script_dir, 'your_data.csv')
 
-# Your Streamlit app code continues here...
+# Now you can use csv_file_path to access the CSV file
