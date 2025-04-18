@@ -1,39 +1,22 @@
 import streamlit as st
-import streamlit_authenticator as stauth
-import yaml
-from yaml.loader import SafeLoader
+from dashboard import show_dashboard
+from login import show_login
+from sidebar import show_sidebar
+from style import set_custom_style
 
-# Load YAML config
-with open('config.yaml') as file:
-    config = yaml.load(file, Loader=SafeLoader)
+# Set Streamlit page configuration
+st.set_page_config(page_title="Clinic Visitor Manager", layout="centered")
 
-# Setup authenticator
-authenticator = stauth.Authenticate(
-    credentials=config['credentials'],
-    cookie_name=config['cookie']['name'],
-    cookie_key=config['cookie']['key'],
-    cookie_expiry_days=config['cookie']['expiry_days']
-)
+# Set custom styling
+set_custom_style()
 
-# Run login
-auth_result = authenticator.login(
-    location='sidebar',
-    fields={
-        'Form name': 'Login',
-        'Username': 'Username',
-        'Password': 'Password',
-        'Login': 'Login'
-    }
-)
+# Display sidebar
+show_sidebar()
 
-# 🔐 Safety check: make sure login ran properly
-if auth_result and "authenticated" in auth_result:
-    if auth_result["authenticated"]:
-        st.sidebar.success(f"Welcome {auth_result['name']} 👋")
-        authenticator.logout('Logout', location='sidebar')
-        st.title("Dashboard")
-        st.write("Here’s your Flower Clinic dashboard.")
-    else:
-        st.sidebar.error("Invalid username or password.")
-else:
-    st.sidebar.info("Please enter your login details.")
+# Display content based on the page selection
+page = st.sidebar.radio("Navigation", ["Login", "Dashboard"])
+
+if page == "Login":
+    show_login()
+elif page == "Dashboard":
+    show_dashboard()
