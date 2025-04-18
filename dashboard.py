@@ -27,48 +27,18 @@ def show_dashboard():
 
     st.header("📝 Register a New Visitor")
 
-    physiotherapy_reasons = [
-        "Back Pain",
-        "Neck Pain",
-        "Frozen Shoulder",
-        "Knee Osteoarthritis",
-        "Ankylosing Spondylitis",
-        "Stroke Rehabilitation",
-        "Parkinson’s Disease",
-        "Multiple Sclerosis",
-        "Spinal Cord Injury",
-        "Cerebral Palsy",
-        "Pelvic Floor Dysfunction",
-        "Chronic Obstructive Pulmonary Disease (COPD)",
-        "Cystic Fibrosis",
-        "Post-Surgical Rehabilitation",
-        "Sports Injury",
-        "Balance Disorders",
-        "Gait Disorders",
-        "Carpal Tunnel Syndrome",
-        "Tendinitis",
-        "Other"
-    ]
-
     with st.form("visitor_form"):
         name = st.text_input("Visitor's Name")
-        reason = st.selectbox("Reason for Visit", physiotherapy_reasons)
-
-        if reason == "Other":
-            custom_reason = st.text_input("Please specify the reason")
-            reason_to_save = custom_reason
-        else:
-            reason_to_save = reason
-
+        reason = st.text_area("Reason for Visit")
         submitted = st.form_submit_button("Add Visitor")
 
         if submitted:
-            if name and reason_to_save:
+            if name and reason:
                 timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
                 c.execute('''
                     INSERT INTO visitors (doctor, name, reason, timestamp)
                     VALUES (?, ?, ?, ?)
-                ''', (doctor, name, reason_to_save, timestamp))
+                ''', (doctor, name, reason, timestamp))
                 conn.commit()
                 st.success("Visitor added successfully.")
             else:
@@ -120,21 +90,17 @@ def show_dashboard():
     st.divider()
     st.subheader("📊 Visitor Analytics")
 
-    # Visitors per day
+    # Number of visitors per day
     visits_per_day = filtered_df.groupby(filtered_df['timestamp'].dt.date).size().reset_index(name='count')
     if not visits_per_day.empty:
-        fig1 = px.bar(visits_per_day, x='timestamp', y='count', title="Visitors Per Day", labels={'timestamp': 'Date', 'count': 'Number of Visitors'})
-        st.plotly_chart(fig1, use_container_width=True)
+        st.plotly_chart(px.bar(visits_per_day, x='timestamp', y='count', title="Visitors Per Day"))
 
-    # Visitors per hour
+    # Number of visitors per hour
     visits_per_hour = filtered_df.groupby(filtered_df['timestamp'].dt.hour).size().reset_index(name='count')
     if not visits_per_hour.empty:
-        fig2 = px.line(visits_per_hour, x='timestamp', y='count', markers=True, title="Visitors Per Hour", labels={'timestamp': 'Hour', 'count': 'Number of Visitors'})
-        st.plotly_chart(fig2, use_container_width=True)
+        st.plotly_chart(px.line(visits_per_hour, x='timestamp', y='count', markers=True, title="Visitors Per Hour"))
 
-    # Visitors by reason
-    visits_by_reason = filtered_df['reason'].value_counts().reset_index()
-    visits_by_reason.columns = ['reason', 'count']
-    if not visits_by_reason.empty:
-        fig3 = px.pie(visits_by_reason, names='reason', values='count', title="Visitors by Reason")
-        st.plotly_chart(fig3, use_container_width=True)
+    # Number of visitors per reason
+    visits_per_reason = filtered_df.groupby("reason").size().reset_index(name='count')
+    if not visits_per_reason.empty:
+        st.plotly_chart(px.pie(visits_per_reason, names="reason", values="count", title="Visitors by Reason"))
