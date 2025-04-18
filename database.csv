@@ -1,34 +1,80 @@
 import sqlite3
 import os
 
-BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-DB_PATH = os.path.join(BASE_DIR, "clinic_visitors.db")
+# Define the path to the SQLite database
+DB_PATH = os.path.join(os.path.dirname(__file__), "clinic_visitors.db")
 
 def get_db_connection():
-    conn = sqlite3.connect(DB_PATH)
-    conn.row_factory = sqlite3.Row
+    """Establishes a connection to the SQLite database."""
+    conn = sqlite3.connect(DB_PATH, check_same_thread=False)
+    conn.row_factory = sqlite3.Row  # Enables name-based access to columns
     return conn
 
 def initialize_database():
+    """Initializes the database by creating necessary tables if they don't exist."""
     conn = get_db_connection()
     cursor = conn.cursor()
+
     # Create users table
-    cursor.execute('''
+    cursor.execute("""
         CREATE TABLE IF NOT EXISTS users (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
-            username TEXT NOT NULL UNIQUE,
+            username TEXT UNIQUE NOT NULL,
             password TEXT NOT NULL
-        );
-    ''')
+        )
+    """)
+
     # Create diseases table
-    cursor.execute('''
+    cursor.execute("""
         CREATE TABLE IF NOT EXISTS diseases (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             disease_name TEXT NOT NULL
-        );
-    ''')
+        )
+    """)
+
+    # Create visitors table
+    cursor.execute("""
+        CREATE TABLE IF NOT EXISTS visitors (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            name TEXT NOT NULL,
+            visit_date TEXT NOT NULL,
+            disease_id INTEGER,
+            FOREIGN KEY (disease_id) REFERENCES diseases(id)
+        )
+    """)
+
     conn.commit()
     conn.close()
 
-# Initialize the database when the module is imported
-initialize_database()
+def get_diseases():
+    """Retrieves all diseases from the database."""
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    cursor.execute("SELECT * FROM diseases")
+    diseases = cursor.fetchall()
+    conn.close()
+    return diseases
+
+def add_disease(disease_name):
+    """Adds a new disease to the database."""
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    cursor.execute("INSERT INTO diseases (disease_name) VALUES (?)", (disease_name,))
+    conn.commit()
+    conn.close()
+
+def update_disease(disease_id, new_name):
+    """Updates the name of an existing disease."""
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    cursor.execute("UPDATE diseases SET disease_name = ? WHERE id = ?", (new_name, disease_id))
+    conn.commit()
+    conn.close()
+
+def delete_disease(disease_id):
+    """Deletes a disease from the database."""
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    cursor.execute("DELETE FROM diseases WHERE id = ?", (disease_id,))
+    conn.commit()
+    conn.close()
