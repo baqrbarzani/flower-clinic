@@ -1,0 +1,19 @@
+credentials:
+  usernames:
+    jsmith:
+      email: jsmith@example.com
+      name: John Smith
+      password: hashed_password_1
+    rbriggs:
+      email: rbriggs@example.com
+      name: Rebecca Briggs
+      password: hashed_password_2
+
+cookie:
+  expiry_days: 30
+  key: some_signature_key
+  name: some_cookie_name
+
+preauthorized:
+  emails:
+    - preauthorized@example.com
