@@ -3,36 +3,36 @@ import streamlit_authenticator as stauth
 import yaml
 from yaml.loader import SafeLoader
 
-# Load configuration
+# Load configuration from YAML
 with open('config.yaml') as file:
     config = yaml.load(file, Loader=SafeLoader)
 
-# Initialize authenticator
+# Setup authenticator
 authenticator = stauth.Authenticate(
-    config['credentials'],
-    config['cookie']['name'],
-    config['cookie']['key'],
-    config['cookie']['expiry_days']
+    credentials=config['credentials'],
+    cookie_name=config['cookie']['name'],
+    cookie_key=config['cookie']['key'],
+    cookie_expiry_days=config['cookie']['expiry_days']
 )
 
-# Render login form in the sidebar
+# Login form
 name, authentication_status, username = authenticator.login(
-    location='sidebar',
     fields={
         'Form name': 'Login',
         'Username': 'Username',
         'Password': 'Password',
         'Login': 'Login'
-    }
+    },
+    location='sidebar'
 )
 
-# Check authentication status
+# Conditional app flow
 if authentication_status:
-    st.sidebar.success(f"Welcome *{name}*")
+    st.sidebar.success(f"Welcome, {name}!")
     authenticator.logout('Logout', location='sidebar')
-    st.title('Main Application')
-    st.write('This is the main content of the app.')
+    st.title("Dashboard")
+    st.write("This is the main dashboard after logging in.")
 elif authentication_status is False:
-    st.sidebar.error('Username/password is incorrect')
+    st.sidebar.error("Invalid username or password.")
 elif authentication_status is None:
-    st.sidebar.warning('Please enter your username and password')
+    st.sidebar.info("Please enter your login credentials.")
